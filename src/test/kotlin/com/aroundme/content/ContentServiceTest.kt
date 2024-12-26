@@ -21,7 +21,7 @@ class ContentServiceTest {
     @Test
     fun `should return content list`() {
         val contentId = 1L
-        val mockContent = Content(id = 1L, category = "Software", content = "Recent trend", media = "/img/trend.jpg", addedAt = LocalDateTime.now())
+        val mockContent = Content(id = 1L, category = "Software", content = "Recent trend", media = "/img/trend.jpg", createdTime = LocalDateTime.now())
         val contentList = listOf(mockContent)
         whenever(contentRepository.findAllBy()).thenReturn(contentList)
 

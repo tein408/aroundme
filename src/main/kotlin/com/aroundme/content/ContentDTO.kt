@@ -7,5 +7,5 @@ data class ReadContentDTO (
     val category: String,
     val content: String,
     val media: String,
-    val addedAt: LocalDateTime
+    val createdTime: LocalDateTime
 )

@@ -23,8 +23,8 @@ class ContentControllerTest {
     @Test
     fun `should return content list`() {
         val contentList = listOf(
-            ReadContentDTO(id = 1L, category = "Software", content = "John Doe's log", media = "/image.jpg", addedAt = LocalDateTime.now()),
-            ReadContentDTO(id = 2L, category = "Network", content = "Jane Smith's announce", media = "/tech.jpg", addedAt = LocalDateTime.now())
+            ReadContentDTO(id = 1L, category = "Software", content = "John Doe's log", media = "/image.jpg", createdTime = LocalDateTime.now()),
+            ReadContentDTO(id = 2L, category = "Network", content = "Jane Smith's announce", media = "/tech.jpg", createdTime = LocalDateTime.now())
         )
         given(contentService.getContentList()).willReturn(contentList)
 

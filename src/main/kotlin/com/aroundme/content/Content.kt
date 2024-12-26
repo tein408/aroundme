@@ -13,7 +13,7 @@ data class Content (
     val category: String,
     val content: String,
     val media: String,
-    val addedAt: LocalDateTime = LocalDateTime.now()
+    val createdTime: LocalDateTime = LocalDateTime.now()
 ) {
     fun toReadContentDTO(): ReadContentDTO {
         return ReadContentDTO(
@@ -21,7 +21,7 @@ data class Content (
             content = content,
             category = category,
             media = media,
-            addedAt = LocalDateTime.now()
+            createdTime = LocalDateTime.now()
         )
     }
 }
