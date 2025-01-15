@@ -21,6 +21,7 @@ class ContentController (
      */
     @GetMapping("/contents")
     fun contentList(): ResponseEntity<List<ReadContentDTO>> {
+        // TODO(https://github.com/tein408/aroundme/issues/2): Add session information to the log
         logger.info("Controller - Getting all contents")
         val contentList = contentService.getContentList()
         return ResponseEntity

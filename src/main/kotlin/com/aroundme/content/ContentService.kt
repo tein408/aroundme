@@ -20,6 +20,7 @@ class ContentService (
      * @return content list
      */
     fun getContentList(): List<ReadContentDTO> {
+        // TODO(https://github.com/tein408/aroundme/issues/2): Add session information to the log
         logger.info("Service - Getting content list")
         val contentList = contentRepository.findAllBy()
         return contentList.map { it.toReadContentDTO() }
