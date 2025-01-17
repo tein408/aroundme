@@ -41,7 +41,6 @@ class ContentServiceTest {
             media = "https://example.com/kotlin.png",
             createdTime = LocalDateTime.now()
         )
-
         val currentTime = LocalDateTime.now()
         val mockContent = Content(
             id = 1L,
@@ -50,9 +49,7 @@ class ContentServiceTest {
             media = createContentDTO.media,
             createdTime = currentTime
         )
-
         every { contentRepository.save(any()) } returns mockContent
-
         val result = contentService.createContent(createContentDTO)
 
         assertEquals(createContentDTO.category, result?.category)
@@ -63,20 +60,18 @@ class ContentServiceTest {
     }
 
     @Test
-    fun `should throw exception when content length exceeds limit`() {
+    fun `should throw an exception when content length exceeds limit`() {
         val createContentDTO = CreateContentDTO(
             category = "Technology",
             content = "A".repeat(501),
             media = "https://example.com/long_content.png",
             createdTime = LocalDateTime.now()
         )
-
         val exception = assertThrows<IllegalArgumentException> {
             contentService.createContent(createContentDTO)
         }
 
         assertEquals("Content length exceeds the limit of 500 characters", exception.message)
-
         verify(exactly = 0) { contentRepository.save(any()) }
     }
 }

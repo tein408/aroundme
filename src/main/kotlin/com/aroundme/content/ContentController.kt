@@ -32,7 +32,7 @@ class ContentController (
     }
 
     /**
-     * Create content
+     * Creates a content to cover text and media.
      *
      * @param createContentDTO
      * @return content details

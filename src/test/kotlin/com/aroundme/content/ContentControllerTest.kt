@@ -67,7 +67,6 @@ class ContentControllerTest {
             media = "https://example.com/image.png",
             createdTime = LocalDateTime.now()
         )
-
         val readContentDetailDTO = ReadContentDetailDTO(
             id = 1L,
             category = createContentDTO.category,
@@ -75,7 +74,6 @@ class ContentControllerTest {
             media = createContentDTO.media,
             createdTime = LocalDateTime.now()
         )
-
         every { contentService.createContent(createContentDTO) } returns readContentDetailDTO
 
         mockMvc.perform(
