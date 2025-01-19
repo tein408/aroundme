@@ -3,7 +3,7 @@ package com.aroundme.content
 import java.time.LocalDateTime
 
 data class ReadContentDTO (
-    val id: Long? = null,
+    val contentId: Long? = null,
     val category: String,
     val content: String,
     val media: String,
@@ -24,7 +24,7 @@ data class CreateContentDTO (
 }
 
 data class ReadContentDetailDTO(
-    val id: Long?,
+    val contentId: Long?,
     val category: String,
     val content: String,
     val media: String,
