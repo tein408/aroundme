@@ -29,14 +29,14 @@ class ContentControllerTest {
     fun `should return content list`() {
         val contentList = listOf(
             ReadContentDTO(
-                id = 1L,
+                contentId = 1L,
                 category = "Software",
                 content = "John Doe's log",
                 media = "/image.jpg",
                 createdTime = LocalDateTime.now()
             ),
             ReadContentDTO(
-                id = 2L,
+                contentId = 2L,
                 category = "Network",
                 content = "Jane Smith's announce",
                 media = "/tech.jpg",
@@ -53,9 +53,9 @@ class ContentControllerTest {
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.size()").value(2))
-            .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(jsonPath("$[0].contentId").value(1L))
             .andExpect(jsonPath("$[0].category").value("Software"))
-            .andExpect(jsonPath("$[1].id").value(2))
+            .andExpect(jsonPath("$[1].contentId").value(2L))
             .andExpect(jsonPath("$[1].category").value("Network"))
     }
 
@@ -68,7 +68,7 @@ class ContentControllerTest {
             createdTime = LocalDateTime.now()
         )
         val readContentDetailDTO = ReadContentDetailDTO(
-            id = 1L,
+            contentId = 1L,
             category = createContentDTO.category,
             content = createContentDTO.content,
             media = createContentDTO.media,
@@ -83,7 +83,7 @@ class ContentControllerTest {
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.contentId").value(1L))
             .andExpect(jsonPath("$.category").value("Technology"))
             .andExpect(jsonPath("$.content").value("Kotlin is amazing!"))
             .andExpect(jsonPath("$.media").value("https://example.com/image.png"))
@@ -107,5 +107,42 @@ class ContentControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.error").exists())
             .andExpect(jsonPath("$.message").exists())
+    }
+
+    @Test
+    fun `should return content detail when content exists`() {
+        val contentId = 1L
+        val readContentDetailDTO = ReadContentDetailDTO(
+            contentId = contentId,
+            category = "Technology",
+            content = "Sample content",
+            media = "/image.jpg",
+            createdTime = LocalDateTime.now()
+        )
+        every { contentService.getContentDetail(contentId) } returns readContentDetailDTO
+
+        mockMvc.perform(get("/contents/$contentId")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.contentId").value(contentId))
+            .andExpect(jsonPath("$.category").value("Technology"))
+            .andExpect(jsonPath("$.content").value("Sample content"))
+            .andExpect(jsonPath("$.media").value("/image.jpg"))
+    }
+
+    @Test
+    fun `should return 404 when content does not exist`() {
+        val contentId = 99L
+        every { contentService.getContentDetail(contentId) } throws IllegalArgumentException("Content with id $contentId not found")
+
+        mockMvc.perform(get("/contents/$contentId")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.error").exists())
+            .andExpect(jsonPath("$.message").value("Content with id $contentId not found"))
     }
 }
