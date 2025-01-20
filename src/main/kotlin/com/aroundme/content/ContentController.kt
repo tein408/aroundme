@@ -59,4 +59,19 @@ class ContentController (
             .ok()
             .body(readContentDetailDTO)
     }
+
+    /**
+     * Updates a content to cover text and media
+     *
+     * @param updateContentDTO
+     * @return content details
+     */
+    @PatchMapping("/contents/{contentId}")
+    fun updateContent(@PathVariable contentId: Long, @RequestBody updateContentDTO: UpdateContentDTO): ResponseEntity<ReadContentDetailDTO> {
+        logger.info("Controller - Updating content by id: $contentId and updated content: $updateContentDTO")
+        val readContentDetailDTO = contentService.updateContent(contentId, updateContentDTO)
+        return ResponseEntity
+            .ok()
+            .body(readContentDetailDTO)
+    }
 }

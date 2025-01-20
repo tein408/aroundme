@@ -10,10 +10,11 @@ import java.time.LocalDateTime
 data class Content (
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val contentId: Long? = null,
-    val category: String,
-    val content: String,
-    val media: String,
-    val createdTime: LocalDateTime
+    var category: String,
+    var content: String,
+    var media: String,
+    val createdTime: LocalDateTime,
+    var updatedTime: LocalDateTime
 ) {
     fun toReadContentDTO(): ReadContentDTO {
         return ReadContentDTO(
@@ -21,7 +22,8 @@ data class Content (
             content = content,
             category = category,
             media = media,
-            createdTime = createdTime
+            createdTime = createdTime,
+            updatedTime = updatedTime
         )
     }
 
@@ -31,7 +33,8 @@ data class Content (
             content = content,
             category = category,
             media = media,
-            createdTime = createdTime
+            createdTime = createdTime,
+            updatedTime = updatedTime
         )
     }
 }

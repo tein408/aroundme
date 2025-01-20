@@ -7,14 +7,16 @@ data class ReadContentDTO (
     val category: String,
     val content: String,
     val media: String,
-    val createdTime: LocalDateTime
+    val createdTime: LocalDateTime,
+    val updatedTime: LocalDateTime
 )
 
 data class CreateContentDTO (
     val category: String,
     val content: String,
     val media: String,
-    val createdTime: LocalDateTime
+    val createdTime: LocalDateTime,
+    val updatedTime: LocalDateTime
 ) {
     fun validate() {
         if (category.isBlank()) throw IllegalArgumentException("Category must not be blank")
@@ -28,5 +30,18 @@ data class ReadContentDetailDTO(
     val category: String,
     val content: String,
     val media: String,
-    val createdTime: LocalDateTime
+    val createdTime: LocalDateTime,
+    val updatedTime: LocalDateTime
 )
+
+data class UpdateContentDTO (
+    val category: String,
+    val content: String,
+    val media: String,
+) {
+    fun validate() {
+        if (category.isBlank()) throw IllegalArgumentException("Category must not be blank")
+        if (content.isBlank()) throw IllegalArgumentException("Content must not be blank")
+        if (media.isBlank()) throw IllegalArgumentException("Media must not be blank")
+    }
+}

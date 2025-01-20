@@ -8,8 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 
@@ -33,14 +32,16 @@ class ContentControllerTest {
                 category = "Software",
                 content = "John Doe's log",
                 media = "/image.jpg",
-                createdTime = LocalDateTime.now()
+                createdTime = LocalDateTime.now(),
+                updatedTime = LocalDateTime.now()
             ),
             ReadContentDTO(
                 contentId = 2L,
                 category = "Network",
                 content = "Jane Smith's announce",
                 media = "/tech.jpg",
-                createdTime = LocalDateTime.now()
+                createdTime = LocalDateTime.now(),
+                updatedTime = LocalDateTime.now()
             )
         )
 
@@ -65,14 +66,16 @@ class ContentControllerTest {
             category = "Technology",
             content = "Kotlin is amazing!",
             media = "https://example.com/image.png",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         val readContentDetailDTO = ReadContentDetailDTO(
             contentId = 1L,
             category = createContentDTO.category,
             content = createContentDTO.content,
             media = createContentDTO.media,
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         every { contentService.createContent(createContentDTO) } returns readContentDetailDTO
 
@@ -95,7 +98,8 @@ class ContentControllerTest {
             category = "",
             content = "",
             media = "",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
 
         mockMvc.perform(
@@ -117,7 +121,8 @@ class ContentControllerTest {
             category = "Technology",
             content = "Sample content",
             media = "/image.jpg",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         every { contentService.getContentDetail(contentId) } returns readContentDetailDTO
 
@@ -144,5 +149,35 @@ class ContentControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.error").exists())
             .andExpect(jsonPath("$.message").value("Content with id $contentId not found"))
+    }
+
+    @Test
+    fun `should update content successfully`() {
+        val contentId = 1L
+        val updateContentDTO = UpdateContentDTO(
+            category = "Updated Category",
+            content = "Updated Content",
+            media = "Updated Media"
+        )
+        val updatedContent = ReadContentDetailDTO(
+            contentId = contentId,
+            category = "Updated Category",
+            content = "Updated Content",
+            media = "Updated Media",
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
+        )
+        every { contentService.updateContent(contentId, updateContentDTO) } returns updatedContent
+
+        mockMvc.perform(
+            patch("/contents/$contentId")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateContentDTO))
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.category").value("Updated Category"))
+            .andExpect(jsonPath("$.content").value("Updated Content"))
+            .andExpect(jsonPath("$.media").value("Updated Media"))
+            .andExpect(jsonPath("$.updatedTime").exists())
     }
 }
