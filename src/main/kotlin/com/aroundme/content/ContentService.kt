@@ -67,7 +67,7 @@ class ContentService (
     }
 
     /**
-     * Get content details when requested via content id
+     * Gets content details when requested via content id
      *
      * @param contentId the ID of the content to retrieve
      * @return the content details or throws an exception if not found

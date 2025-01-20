@@ -46,7 +46,7 @@ class ContentController (
     }
 
     /**
-     * Get content details when requested via content id
+     * Gets content details when requested via content id
      *
      * @param contentId
      * @return content details

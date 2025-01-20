@@ -98,13 +98,14 @@ class ContentServiceTest {
     }
 
     @Test
-    fun `should throw exception when content does not exist`() {
+    fun `should throw an exception when a content does not exist`() {
         val contentId = 99L
         every { contentRepository.findByIdOrNull(contentId) } returns null
 
         val exception = assertThrows<IllegalArgumentException> {
             contentService.getContentDetail(contentId)
         }
+
         assertEquals("Content with id $contentId not found", exception.message)
     }
 }
