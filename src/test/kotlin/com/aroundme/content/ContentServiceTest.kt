@@ -23,7 +23,8 @@ class ContentServiceTest {
             category = "Software",
             content = "Recent trend",
             media = "/img/trend.jpg",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         val contentList = listOf(mockContent)
         every { contentRepository.findAllBy() } returns contentList
@@ -40,7 +41,8 @@ class ContentServiceTest {
             category = "Technology",
             content = "Kotlin is a great programming language.",
             media = "https://example.com/kotlin.png",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         val currentTime = LocalDateTime.now()
         val mockContent = Content(
@@ -48,7 +50,8 @@ class ContentServiceTest {
             category = createContentDTO.category,
             content = createContentDTO.content,
             media = createContentDTO.media,
-            createdTime = currentTime
+            createdTime = currentTime,
+            updatedTime = currentTime
         )
         every { contentRepository.save(any()) } returns mockContent
         val result = contentService.createContent(createContentDTO)
@@ -66,7 +69,8 @@ class ContentServiceTest {
             category = "Technology",
             content = "A".repeat(501),
             media = "https://example.com/long_content.png",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         val exception = assertThrows<IllegalArgumentException> {
             contentService.createContent(createContentDTO)
@@ -84,7 +88,8 @@ class ContentServiceTest {
             category = "Technology",
             content = "Sample content",
             media = "/image.jpg",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         every { contentRepository.findByIdOrNull(contentId) } returns findContent
 

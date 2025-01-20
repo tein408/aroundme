@@ -33,14 +33,16 @@ class ContentControllerTest {
                 category = "Software",
                 content = "John Doe's log",
                 media = "/image.jpg",
-                createdTime = LocalDateTime.now()
+                createdTime = LocalDateTime.now(),
+                updatedTime = LocalDateTime.now()
             ),
             ReadContentDTO(
                 contentId = 2L,
                 category = "Network",
                 content = "Jane Smith's announce",
                 media = "/tech.jpg",
-                createdTime = LocalDateTime.now()
+                createdTime = LocalDateTime.now(),
+                updatedTime = LocalDateTime.now()
             )
         )
 
@@ -65,14 +67,16 @@ class ContentControllerTest {
             category = "Technology",
             content = "Kotlin is amazing!",
             media = "https://example.com/image.png",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         val readContentDetailDTO = ReadContentDetailDTO(
             contentId = 1L,
             category = createContentDTO.category,
             content = createContentDTO.content,
             media = createContentDTO.media,
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         every { contentService.createContent(createContentDTO) } returns readContentDetailDTO
 
@@ -95,7 +99,8 @@ class ContentControllerTest {
             category = "",
             content = "",
             media = "",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
 
         mockMvc.perform(
@@ -117,7 +122,8 @@ class ContentControllerTest {
             category = "Technology",
             content = "Sample content",
             media = "/image.jpg",
-            createdTime = LocalDateTime.now()
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
         )
         every { contentService.getContentDetail(contentId) } returns readContentDetailDTO
 
