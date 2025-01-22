@@ -1,8 +1,6 @@
 package com.aroundme.content
 
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -191,4 +189,38 @@ class ContentServiceTest {
 
         assertEquals("Content with id $contentId not found", exception.message)
     }
+
+    @Test
+    fun `should delete a content successfully`() {
+        val contentId = 1L
+        val content = Content(
+            contentId = contentId,
+            category = "Test Category",
+            content = "Test Content",
+            media = "Test Media",
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
+        )
+        every { contentRepository.findByIdOrNull(contentId) } returns content
+        justRun { contentRepository.delete(content) }
+
+        contentService.deleteContent(contentId)
+
+        verify(exactly = 1) { contentRepository.findByIdOrNull(contentId) }
+        verify(exactly = 1) { contentRepository.delete(content) }
+    }
+
+    @Test
+    fun `should throw an exception when deleting content if the content does not exist`() {
+        val contentId = 99L
+        every { contentRepository.findByIdOrNull(contentId) } returns null
+
+        val exception = assertThrows<IllegalArgumentException> {
+            contentService.deleteContent(contentId)
+        }
+        assertEquals("Content with id $contentId not found", exception.message)
+        verify(exactly = 1) { contentRepository.findByIdOrNull(contentId) }
+        verify(exactly = 0) { contentRepository.delete(any()) }
+    }
+
 }

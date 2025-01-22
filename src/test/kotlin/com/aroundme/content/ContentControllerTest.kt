@@ -3,6 +3,7 @@ package com.aroundme.content
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import com.ninjasquad.springmockk.MockkBean
+import io.mockk.justRun
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -140,7 +141,7 @@ class ContentControllerTest {
     }
 
     @Test
-    fun `should return 404 when content does not exist`() {
+    fun `should return 404 when updating content does not exist`() {
         val contentId = 99L
         every { contentService.getContentDetail(contentId) } throws IllegalArgumentException("Content with id $contentId not found")
 
@@ -182,4 +183,14 @@ class ContentControllerTest {
             .andExpect(jsonPath("$.media").value("Updated Media"))
             .andExpect(jsonPath("$.updatedTime").exists())
     }
+
+    @Test
+    fun `should delete content successfully`() {
+        val contentId = 1L
+        justRun { contentService.deleteContent(contentId) }
+
+        mockMvc.perform(delete("/contents/{contentId}", contentId))
+            .andExpect(status().isNoContent)
+    }
+
 }
