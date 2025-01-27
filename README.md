@@ -1,7 +1,9 @@
 # Contents API System
 
 ## 1. Introduction
-To implement a content API system. Users can like the content and view the content through the content API.
+This is a location-based service that recommends nearby users.  
+Developing the necessary features step by step, starting with smaller components.  
+The first function is content-related functions.
 
 ## 2. Content API System
 
