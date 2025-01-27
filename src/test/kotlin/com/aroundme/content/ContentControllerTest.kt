@@ -10,6 +10,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 
@@ -150,5 +151,35 @@ class ContentControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.error").exists())
             .andExpect(jsonPath("$.message").value("Content with id $contentId not found"))
+    }
+
+    @Test
+    fun `should update content successfully`() {
+        val contentId = 1L
+        val updateContentDTO = UpdateContentDTO(
+            category = "Updated Category",
+            content = "Updated Content",
+            media = "Updated Media"
+        )
+        val updatedContent = ReadContentDetailDTO(
+            contentId = contentId,
+            category = "Updated Category",
+            content = "Updated Content",
+            media = "Updated Media",
+            createdTime = LocalDateTime.now(),
+            updatedTime = LocalDateTime.now()
+        )
+        every { contentService.updateContent(contentId, updateContentDTO) } returns updatedContent
+
+        mockMvc.perform(
+            patch("/contents/$contentId")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateContentDTO))
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.category").value("Updated Category"))
+            .andExpect(jsonPath("$.content").value("Updated Content"))
+            .andExpect(jsonPath("$.media").value("Updated Media"))
+            .andExpect(jsonPath("$.updatedTime").exists())
     }
 }

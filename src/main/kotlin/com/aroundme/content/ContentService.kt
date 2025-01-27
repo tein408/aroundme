@@ -40,7 +40,7 @@ class ContentService (
         logger.info("Service - Creating new content: $createContentDTO")
         val currentTime = LocalDateTime.now()
 
-        validateContent(createContentDTO)
+        validateContent(createContentDTO.content)
 
         val content = Content(
             category = createContentDTO.category,
@@ -57,13 +57,13 @@ class ContentService (
             createContentDTO.category,
             createContentDTO.content,
             createContentDTO.media,
-            currentTime,
-            currentTime
+            createContentDTO.createdTime,
+            createContentDTO.updatedTime
         )
     }
 
-    private fun validateContent(createContentDTO: CreateContentDTO) {
-        if (createContentDTO.content.length > 500) {
+    private fun validateContent(content: String) {
+        if (content.length > 500) {
             throw IllegalArgumentException("Content length exceeds the limit of 500 characters")
         }
     }
@@ -79,6 +79,38 @@ class ContentService (
         val content = contentRepository.findByIdOrNull(contentId)
             ?: throw IllegalArgumentException("Content with id $contentId not found")
         return content.toReadContentDetailDTO()
+    }
+
+    /**
+     * Updates a content to cover text and media
+     *
+     * @param updateContentDTO
+     * @return content details
+     */
+    @Transactional
+    fun updateContent(contentId: Long, updateContentDTO: UpdateContentDTO): ReadContentDetailDTO {
+        logger.info("Service - Updating content by id: $contentId and updated content: $updateContentDTO")
+
+        updateContentDTO.validate()
+        validateContent(updateContentDTO.content)
+
+        val currentTime = LocalDateTime.now()
+        val findContent = contentRepository.findByIdOrNull(contentId)
+            ?: throw IllegalArgumentException("Content with id $contentId not found")
+
+        updateContentDTO.category.let { findContent.category = it }
+        updateContentDTO.content.let { findContent.content = it }
+        updateContentDTO.media.let { findContent.media = it }
+        findContent.updatedTime = currentTime
+
+        return ReadContentDetailDTO(
+            contentId,
+            updateContentDTO.category,
+            updateContentDTO.content,
+            updateContentDTO.media,
+            findContent.createdTime,
+            findContent.updatedTime
+        )
     }
 
 }
