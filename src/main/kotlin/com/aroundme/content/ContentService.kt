@@ -46,7 +46,8 @@ class ContentService (
             category = createContentDTO.category,
             content = createContentDTO.content,
             media = createContentDTO.media,
-            createdTime = currentTime
+            createdTime = currentTime,
+            updatedTime = currentTime
         )
         val savedContent = contentRepository.save(content)
         logger.info { "Service - Content created successfully: $savedContent" }
@@ -56,6 +57,7 @@ class ContentService (
             createContentDTO.category,
             createContentDTO.content,
             createContentDTO.media,
+            currentTime,
             currentTime
         )
     }
