@@ -2,7 +2,13 @@ package com.aroundme.content
 
 import mu.KotlinLogging
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 /**
  * Content controller class
@@ -74,4 +80,20 @@ class ContentController (
             .ok()
             .body(readContentDetailDTO)
     }
+
+    /**
+     * Filters content through startDate and endDate
+     *
+     * @param startDate, endDate
+     * @return content list
+     */
+    @GetMapping("/contents/filter/date")
+    fun filterByCreatedTime(@RequestParam(required = false) startDate: String?, @RequestParam(required = false) endDate: String?): ResponseEntity<List<ReadContentDTO>> {
+        logger.info("Controller - Filter by startDate: $startDate and endDate: $endDate")
+        val contentList = contentService.filterByCreatedTime(startDate, endDate)
+        return ResponseEntity
+            .ok()
+            .body(contentList)
+    }
+
 }

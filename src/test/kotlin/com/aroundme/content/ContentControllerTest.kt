@@ -11,7 +11,10 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @WebMvcTest(ContentController::class)
@@ -182,4 +185,111 @@ class ContentControllerTest {
             .andExpect(jsonPath("$.media").value("Updated Media"))
             .andExpect(jsonPath("$.updatedTime").exists())
     }
+
+    @Test
+    fun `should return filtered content list when valid dates are provided`() {
+        val startDate = LocalDate.of(2025, 1, 1)
+        val endDate = LocalDate.of(2025, 1, 10)
+        val mockContentList = listOf(
+            ReadContentDTO(
+                contentId = 1L,
+                category = "sample",
+                content = "Sample feed 1",
+                media = "/sample.jpg",
+                createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
+            ),
+            ReadContentDTO(
+                contentId = 2L,
+                category = "sample2",
+                content = "Sample feed 2",
+                media = "/sample2.jpg",
+                createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
+            )
+        )
+
+        every { contentService.filterByCreatedTime(startDate.toString(), endDate.toString()) } returns mockContentList
+
+        mockMvc.perform(get("/contents/filter/date")
+            .queryParam("startDate", startDate.toString())
+            .queryParam("endDate", endDate.toString()))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(mockContentList.size))
+            .andExpect(jsonPath("$[0].contentId").value(mockContentList[0].contentId))
+            .andExpect(jsonPath("$[0].content").value(mockContentList[0].content))
+            .andExpect(jsonPath("$[1].contentId").value(mockContentList[1].contentId))
+            .andExpect(jsonPath("$[1].content").value(mockContentList[1].content))
+    }
+
+    @Test
+    fun `should return filtered content list when start date only provided`() {
+        val startDate = LocalDate.of(2025, 1, 1)
+        val mockContentList = listOf(
+            ReadContentDTO(
+                contentId = 1L,
+                category = "sample",
+                content = "Sample feed 1",
+                media = "/sample.jpg",
+                createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
+            ),
+            ReadContentDTO(
+                contentId = 2L,
+                category = "sample2",
+                content = "Sample feed 2",
+                media = "/sample2.jpg",
+                createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
+            )
+        )
+
+        every { contentService.filterByCreatedTime(startDate.toString(), "") } returns mockContentList
+
+        mockMvc.perform(get("/contents/filter/date")
+            .queryParam("startDate", startDate.toString())
+            .queryParam("endDate", ""))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(mockContentList.size))
+            .andExpect(jsonPath("$[0].contentId").value(mockContentList[0].contentId))
+            .andExpect(jsonPath("$[0].content").value(mockContentList[0].content))
+            .andExpect(jsonPath("$[1].contentId").value(mockContentList[1].contentId))
+            .andExpect(jsonPath("$[1].content").value(mockContentList[1].content))
+    }
+
+    @Test
+    fun `should return filtered content list when end date only provided`() {
+        val endDate = LocalDate.of(2025, 1, 10)
+        val mockContentList = listOf(
+            ReadContentDTO(
+                contentId = 1L,
+                category = "sample",
+                content = "Sample feed 1",
+                media = "/sample.jpg",
+                createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
+            ),
+            ReadContentDTO(
+                contentId = 2L,
+                category = "sample2",
+                content = "Sample feed 2",
+                media = "/sample2.jpg",
+                createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
+            )
+        )
+
+        every { contentService.filterByCreatedTime("", endDate.toString()) } returns mockContentList
+
+        mockMvc.perform(get("/contents/filter/date")
+            .queryParam("startDate", "")
+            .queryParam("endDate", endDate.toString()))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(mockContentList.size))
+            .andExpect(jsonPath("$[0].contentId").value(mockContentList[0].contentId))
+            .andExpect(jsonPath("$[0].content").value(mockContentList[0].content))
+            .andExpect(jsonPath("$[1].contentId").value(mockContentList[1].contentId))
+            .andExpect(jsonPath("$[1].content").value(mockContentList[1].content))
+    }
+
 }
