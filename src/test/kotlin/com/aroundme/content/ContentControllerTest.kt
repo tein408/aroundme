@@ -227,4 +227,5 @@ class ContentControllerTest {
             .andExpect(jsonPath("$[1].contentId").value(mockContentList[1].contentId))
             .andExpect(jsonPath("$[1].feed").value(mockContentList[1].feed))
     }
+
 }

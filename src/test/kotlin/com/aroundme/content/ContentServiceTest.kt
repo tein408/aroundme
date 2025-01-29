@@ -267,5 +267,5 @@ class ContentServiceTest {
         assertTrue(result.isEmpty())
         verify { contentRepository.findAllByFeedContains(query) }
     }
-
+    
 }
