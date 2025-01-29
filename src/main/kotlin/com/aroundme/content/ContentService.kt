@@ -113,4 +113,19 @@ class ContentService (
         )
     }
 
+    /**
+     * Deletes a content through contentId
+     *
+     * @param contentId
+     * @return void
+     */
+    @Transactional
+    fun deleteContent(contentId: Long) {
+        logger.info("Service - Deleting content by id: $contentId")
+        val content = contentRepository.findByIdOrNull(contentId)
+            ?: throw IllegalArgumentException("Content with id $contentId not found")
+        contentRepository.delete(content)
+        logger.info("Content with id $contentId has been deleted")
+    }
+
 }

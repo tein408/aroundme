@@ -74,4 +74,17 @@ class ContentController (
             .ok()
             .body(readContentDetailDTO)
     }
+
+    /**
+     * Deletes a content through contentId
+     *
+     * @param contentId
+     * @return ResponseEntity<Void>
+     */
+    @DeleteMapping("/contents/{contentId}")
+    fun deleteContent(@PathVariable contentId: Long): ResponseEntity<Void> {
+        contentService.deleteContent(contentId)
+        return ResponseEntity.noContent().build()
+    }
+
 }
