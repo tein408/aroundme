@@ -87,4 +87,17 @@ class ContentController (
         return ResponseEntity.noContent().build()
     }
 
+    /**
+     * Searches contents through query
+     *
+     * @param query
+     * @return content list
+     */
+    @GetMapping("/contents/search")
+    fun searchContent(@RequestParam query: String): ResponseEntity<List<ReadContentDTO>> {
+        logger.info("Controller - Searching contents: $query")
+        val searchResult = contentService.searchContent(query)
+        return ResponseEntity.ok().body(searchResult)
+    }
+
 }

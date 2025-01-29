@@ -40,11 +40,11 @@ class ContentService (
         logger.info("Service - Creating new content: $createContentDTO")
         val currentTime = LocalDateTime.now()
 
-        validateContent(createContentDTO.content)
+        validateContent(createContentDTO.feed)
 
         val content = Content(
             category = createContentDTO.category,
-            content = createContentDTO.content,
+            feed = createContentDTO.feed,
             media = createContentDTO.media,
             createdTime = currentTime,
             updatedTime = currentTime
@@ -55,7 +55,7 @@ class ContentService (
         return ReadContentDetailDTO(
             savedContent.contentId,
             createContentDTO.category,
-            createContentDTO.content,
+            createContentDTO.feed,
             createContentDTO.media,
             createContentDTO.createdTime,
             createContentDTO.updatedTime
@@ -92,21 +92,21 @@ class ContentService (
         logger.info("Service - Updating content by id: $contentId and updated content: $updateContentDTO")
 
         updateContentDTO.validate()
-        validateContent(updateContentDTO.content)
+        validateContent(updateContentDTO.feed)
 
         val currentTime = LocalDateTime.now()
         val findContent = contentRepository.findByIdOrNull(contentId)
             ?: throw IllegalArgumentException("Content with id $contentId not found")
 
         updateContentDTO.category.let { findContent.category = it }
-        updateContentDTO.content.let { findContent.content = it }
+        updateContentDTO.feed.let { findContent.feed = it }
         updateContentDTO.media.let { findContent.media = it }
         findContent.updatedTime = currentTime
 
         return ReadContentDetailDTO(
             contentId,
             updateContentDTO.category,
-            updateContentDTO.content,
+            updateContentDTO.feed,
             updateContentDTO.media,
             findContent.createdTime,
             findContent.updatedTime
@@ -126,6 +126,18 @@ class ContentService (
             ?: throw IllegalArgumentException("Content with id $contentId not found")
         contentRepository.delete(content)
         logger.info("Content with id $contentId has been deleted")
+    }
+
+    /**
+     * Searches content through query
+     *
+     * @param query
+     * @return content list
+     */
+    fun searchContent(query: String): List<ReadContentDTO> {
+        logger.info("Service - Searching content by query: $query")
+        val searchContent = contentRepository.findAllByFeedContains(query)
+        return searchContent.map { it.toReadContentDTO() }
     }
 
 }
