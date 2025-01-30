@@ -1,11 +1,13 @@
 package com.aroundme.content
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.data.repository.findByIdOrNull
@@ -280,7 +282,7 @@ class ContentServiceTest {
             Content(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -288,7 +290,7 @@ class ContentServiceTest {
             Content(
                 contentId = 2L,
                 category = "sample",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -309,7 +311,7 @@ class ContentServiceTest {
             Content(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -317,7 +319,7 @@ class ContentServiceTest {
             Content(
                 contentId = 2L,
                 category = "sample",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -338,7 +340,7 @@ class ContentServiceTest {
             Content(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -346,7 +348,7 @@ class ContentServiceTest {
             Content(
                 contentId = 2L,
                 category = "sample",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -366,7 +368,7 @@ class ContentServiceTest {
             Content(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -374,7 +376,7 @@ class ContentServiceTest {
             Content(
                 contentId = 2L,
                 category = "sample",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -402,8 +404,8 @@ class ContentServiceTest {
         val result = contentService.filterByCategory(category)
 
         assertThat(result).hasSize(2)
-        assertThat(result[0].content).isEqualTo("Tech News")
-        assertThat(result[1].content).isEqualTo("AI Trends")
+        assertThat(result[0].feed).isEqualTo("Tech News")
+        assertThat(result[1].feed).isEqualTo("AI Trends")
         verify(exactly = 1) { contentRepository.findAllByCategoryIs(category) }
     }
 

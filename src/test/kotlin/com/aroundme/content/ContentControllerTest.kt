@@ -242,7 +242,7 @@ class ContentControllerTest {
             ReadContentDTO(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "/sample.jpg",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -250,7 +250,7 @@ class ContentControllerTest {
             ReadContentDTO(
                 contentId = 2L,
                 category = "sample2",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "/sample2.jpg",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -265,9 +265,9 @@ class ContentControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.length()").value(mockContentList.size))
             .andExpect(jsonPath("$[0].contentId").value(mockContentList[0].contentId))
-            .andExpect(jsonPath("$[0].content").value(mockContentList[0].content))
+            .andExpect(jsonPath("$[0].feed").value(mockContentList[0].feed))
             .andExpect(jsonPath("$[1].contentId").value(mockContentList[1].contentId))
-            .andExpect(jsonPath("$[1].content").value(mockContentList[1].content))
+            .andExpect(jsonPath("$[1].feed").value(mockContentList[1].feed))
     }
 
     @Test
@@ -277,7 +277,7 @@ class ContentControllerTest {
             ReadContentDTO(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "/sample.jpg",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -285,7 +285,7 @@ class ContentControllerTest {
             ReadContentDTO(
                 contentId = 2L,
                 category = "sample2",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "/sample2.jpg",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -300,9 +300,9 @@ class ContentControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.length()").value(mockContentList.size))
             .andExpect(jsonPath("$[0].contentId").value(mockContentList[0].contentId))
-            .andExpect(jsonPath("$[0].content").value(mockContentList[0].content))
+            .andExpect(jsonPath("$[0].feed").value(mockContentList[0].feed))
             .andExpect(jsonPath("$[1].contentId").value(mockContentList[1].contentId))
-            .andExpect(jsonPath("$[1].content").value(mockContentList[1].content))
+            .andExpect(jsonPath("$[1].feed").value(mockContentList[1].feed))
     }
 
     @Test
@@ -312,7 +312,7 @@ class ContentControllerTest {
             ReadContentDTO(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "/sample.jpg",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -320,7 +320,7 @@ class ContentControllerTest {
             ReadContentDTO(
                 contentId = 2L,
                 category = "sample2",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "/sample2.jpg",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -335,9 +335,9 @@ class ContentControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.length()").value(mockContentList.size))
             .andExpect(jsonPath("$[0].contentId").value(mockContentList[0].contentId))
-            .andExpect(jsonPath("$[0].content").value(mockContentList[0].content))
+            .andExpect(jsonPath("$[0].feed").value(mockContentList[0].feed))
             .andExpect(jsonPath("$[1].contentId").value(mockContentList[1].contentId))
-            .andExpect(jsonPath("$[1].content").value(mockContentList[1].content))
+            .andExpect(jsonPath("$[1].feed").value(mockContentList[1].feed))
     }
     
     
@@ -345,33 +345,35 @@ class ContentControllerTest {
     fun `should return content list when valid category is provided`() {
         val category = "Technology"
         val mockContents = listOf(
-            ReadContentDTO(1L,
-                "Technology",
-                "Tech News",
-                "media1",
-                LocalDateTime.now(),
-                LocalDateTime.now()),
-            ReadContentDTO(2L,
-                "Technology",
-                "AI Trends",
-                "media2",
-                LocalDateTime.now(),
-                LocalDateTime.now())
+            ReadContentDTO(
+                contentId = 1L,
+                category = "Technology",
+                feed = "Tech News",
+                media = "media1",
+                createdTime = LocalDateTime.now(),
+                updatedTime = LocalDateTime.now()),
+            ReadContentDTO(
+                contentId = 2L,
+                category = "Technology",
+                feed = "AI Trends",
+                media = "media2",
+                createdTime = LocalDateTime.now(),
+                updatedTime = LocalDateTime.now())
         )
         every { contentService.filterByCategory(category) } returns mockContents
 
         mockMvc.perform(
             get("/contents/filter/category")
-                .param("category", category)
+                .queryParam("category", category)
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.size()").value(2))
             .andExpect(jsonPath("$[0].contentId").value(1))
-            .andExpect(jsonPath("$[0].content").value("Tech News"))
+            .andExpect(jsonPath("$[0].feed").value("Tech News"))
             .andExpect(jsonPath("$[1].contentId").value(2))
-            .andExpect(jsonPath("$[1].content").value("AI Trends"))
+            .andExpect(jsonPath("$[1].feed").value("AI Trends"))
         verify(exactly = 1) { contentService.filterByCategory(category) }
     }
 
@@ -382,7 +384,7 @@ class ContentControllerTest {
 
         mockMvc.perform(
             get("/contents/filter/category")
-                .param("category", category)
+                .queryParam("category", category)
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
