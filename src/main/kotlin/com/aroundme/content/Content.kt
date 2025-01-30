@@ -11,7 +11,7 @@ data class Content (
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val contentId: Long? = null,
     var category: String,
-    var content: String,
+    var feed: String,
     var media: String,
     val createdTime: LocalDateTime,
     var updatedTime: LocalDateTime
@@ -19,8 +19,8 @@ data class Content (
     fun toReadContentDTO(): ReadContentDTO {
         return ReadContentDTO(
             contentId = contentId,
-            content = content,
             category = category,
+            feed = feed,
             media = media,
             createdTime = createdTime,
             updatedTime = updatedTime
@@ -30,8 +30,8 @@ data class Content (
     fun toReadContentDetailDTO(): ReadContentDetailDTO {
         return ReadContentDetailDTO(
             contentId = contentId,
-            content = content,
             category = category,
+            feed = feed,
             media = media,
             createdTime = createdTime,
             updatedTime = updatedTime

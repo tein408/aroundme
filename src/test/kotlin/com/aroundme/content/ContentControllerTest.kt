@@ -3,6 +3,7 @@ package com.aroundme.content
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import com.ninjasquad.springmockk.MockkBean
+import io.mockk.justRun
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -11,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -35,7 +37,7 @@ class ContentControllerTest {
             ReadContentDTO(
                 contentId = 1L,
                 category = "Software",
-                content = "John Doe's log",
+                feed = "John Doe's log",
                 media = "/image.jpg",
                 createdTime = LocalDateTime.now(),
                 updatedTime = LocalDateTime.now()
@@ -43,7 +45,7 @@ class ContentControllerTest {
             ReadContentDTO(
                 contentId = 2L,
                 category = "Network",
-                content = "Jane Smith's announce",
+                feed = "Jane Smith's announce",
                 media = "/tech.jpg",
                 createdTime = LocalDateTime.now(),
                 updatedTime = LocalDateTime.now()
@@ -69,7 +71,7 @@ class ContentControllerTest {
     fun `should create content successfully`() {
         val createContentDTO = CreateContentDTO(
             category = "Technology",
-            content = "Kotlin is amazing!",
+            feed = "Kotlin is amazing!",
             media = "https://example.com/image.png",
             createdTime = LocalDateTime.now(),
             updatedTime = LocalDateTime.now()
@@ -77,7 +79,7 @@ class ContentControllerTest {
         val readContentDetailDTO = ReadContentDetailDTO(
             contentId = 1L,
             category = createContentDTO.category,
-            content = createContentDTO.content,
+            feed = createContentDTO.feed,
             media = createContentDTO.media,
             createdTime = LocalDateTime.now(),
             updatedTime = LocalDateTime.now()
@@ -93,7 +95,7 @@ class ContentControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.contentId").value(1L))
             .andExpect(jsonPath("$.category").value("Technology"))
-            .andExpect(jsonPath("$.content").value("Kotlin is amazing!"))
+            .andExpect(jsonPath("$.feed").value("Kotlin is amazing!"))
             .andExpect(jsonPath("$.media").value("https://example.com/image.png"))
     }
 
@@ -101,7 +103,7 @@ class ContentControllerTest {
     fun `should return bad request when content is invalid`() {
         val invalidContentDTO = CreateContentDTO(
             category = "",
-            content = "",
+            feed = "",
             media = "",
             createdTime = LocalDateTime.now(),
             updatedTime = LocalDateTime.now()
@@ -124,7 +126,7 @@ class ContentControllerTest {
         val readContentDetailDTO = ReadContentDetailDTO(
             contentId = contentId,
             category = "Technology",
-            content = "Sample content",
+            feed = "Sample content",
             media = "/image.jpg",
             createdTime = LocalDateTime.now(),
             updatedTime = LocalDateTime.now()
@@ -138,12 +140,12 @@ class ContentControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.contentId").value(contentId))
             .andExpect(jsonPath("$.category").value("Technology"))
-            .andExpect(jsonPath("$.content").value("Sample content"))
+            .andExpect(jsonPath("$.feed").value("Sample content"))
             .andExpect(jsonPath("$.media").value("/image.jpg"))
     }
 
     @Test
-    fun `should return 404 when content does not exist`() {
+    fun `should return 404 when updating content does not exist`() {
         val contentId = 99L
         every { contentService.getContentDetail(contentId) } throws IllegalArgumentException("Content with id $contentId not found")
 
@@ -161,13 +163,13 @@ class ContentControllerTest {
         val contentId = 1L
         val updateContentDTO = UpdateContentDTO(
             category = "Updated Category",
-            content = "Updated Content",
+            feed = "Updated Content",
             media = "Updated Media"
         )
         val updatedContent = ReadContentDetailDTO(
             contentId = contentId,
             category = "Updated Category",
-            content = "Updated Content",
+            feed = "Updated Content",
             media = "Updated Media",
             createdTime = LocalDateTime.now(),
             updatedTime = LocalDateTime.now()
@@ -181,9 +183,52 @@ class ContentControllerTest {
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.category").value("Updated Category"))
-            .andExpect(jsonPath("$.content").value("Updated Content"))
+            .andExpect(jsonPath("$.feed").value("Updated Content"))
             .andExpect(jsonPath("$.media").value("Updated Media"))
             .andExpect(jsonPath("$.updatedTime").exists())
+    }
+    
+    @Test
+    fun `should delete content successfully`() {
+        val contentId = 1L
+        justRun { contentService.deleteContent(contentId) }
+
+        mockMvc.perform(delete("/contents/{contentId}", contentId))
+            .andExpect(status().isNoContent)
+    }
+    
+    @Test
+    fun `should return content list when valid query is provided`() {
+        val query = "sample"
+        val mockContentList = listOf(
+            ReadContentDTO(
+                contentId = 1L,
+                category = "sample",
+                feed = "Sample feed 1",
+                media = "/sample.jpg",
+                createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
+            ),
+            ReadContentDTO(
+                contentId = 2L,
+                category = "sample2",
+                feed = "Sample feed 2",
+                media = "/sample2.jpg",
+                createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
+            )
+        )
+        
+        every { contentService.searchContent(query) } returns mockContentList
+
+        mockMvc.perform(get("/contents/search")
+            .param("query", query))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(mockContentList.size))
+            .andExpect(jsonPath("$[0].contentId").value(mockContentList[0].contentId))
+            .andExpect(jsonPath("$[0].feed").value(mockContentList[0].feed))
+            .andExpect(jsonPath("$[1].contentId").value(mockContentList[1].contentId))
+            .andExpect(jsonPath("$[1].feed").value(mockContentList[1].feed))
     }
 
     @Test
