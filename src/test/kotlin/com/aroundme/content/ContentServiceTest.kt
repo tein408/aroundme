@@ -1,11 +1,15 @@
 package com.aroundme.content
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class ContentServiceTest {
@@ -188,7 +192,7 @@ class ContentServiceTest {
 
         assertEquals("Content with id $contentId not found", exception.message)
     }
-
+    
     @Test
     fun `should delete a content successfully`() {
         val contentId = 1L
@@ -267,5 +271,122 @@ class ContentServiceTest {
         assertTrue(result.isEmpty())
         verify { contentRepository.findAllByFeedContains(query) }
     }
-    
+
+    @Test
+    fun `should filter contents by created time`() {
+        val startDate = LocalDate.of(2025, 1, 1)
+        val endDate = LocalDate.of(2025, 1, 10)
+        val mockContents = listOf(
+            Content(
+                contentId = 1L,
+                category = "sample",
+                content = "Sample feed 1",
+                media = "Test Media",
+                createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
+            ),
+            Content(
+                contentId = 2L,
+                category = "sample",
+                content = "Sample feed 2",
+                media = "Test Media",
+                createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
+            )
+        )
+        every { contentRepository.findAllByCreatedTimeBetween(any(), any()) } returns mockContents
+
+        val result = contentService.filterByCreatedTime(startDate.toString(), endDate.toString())
+
+        assertEquals(2, result.size)
+        verify { contentRepository.findAllByCreatedTimeBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59)) }
+    }
+
+    @Test
+    fun `should filter contents by created time when start date only provided`() {
+        val startDate = LocalDate.of(2025, 1, 1)
+        val mockContents = listOf(
+            Content(
+                contentId = 1L,
+                category = "sample",
+                content = "Sample feed 1",
+                media = "Test Media",
+                createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
+            ),
+            Content(
+                contentId = 2L,
+                category = "sample",
+                content = "Sample feed 2",
+                media = "Test Media",
+                createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
+            )
+        )
+        every { contentRepository.findAllByCreatedTimeBetween(any(), any()) } returns mockContents
+
+        val result = contentService.filterByCreatedTime(startDate.toString(), null)
+
+        assertEquals(2, result.size)
+        verify { contentRepository.findAllByCreatedTimeBetween(startDate.atStartOfDay(), startDate.atTime(23, 59, 59)) }
+    }
+
+    @Test
+    fun `should filter contents by created time when end date only provided`() {
+        val endDate = LocalDate.of(2025, 1, 10)
+        val mockContents = listOf(
+            Content(
+                contentId = 1L,
+                category = "sample",
+                content = "Sample feed 1",
+                media = "Test Media",
+                createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
+            ),
+            Content(
+                contentId = 2L,
+                category = "sample",
+                content = "Sample feed 2",
+                media = "Test Media",
+                createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
+            )
+        )
+        every { contentRepository.findAllByCreatedTimeBetween(any(), any()) } returns mockContents
+
+        val result = contentService.filterByCreatedTime(null, endDate.toString())
+
+        assertEquals(2, result.size)
+        verify { contentRepository.findAllByCreatedTimeBetween(endDate.atStartOfDay(), endDate.atTime(23, 59, 59)) }
+    }
+
+    @Test
+    fun `should throw an exception when not valid dates are provided`() {
+        val mockContents = listOf(
+            Content(
+                contentId = 1L,
+                category = "sample",
+                content = "Sample feed 1",
+                media = "Test Media",
+                createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
+            ),
+            Content(
+                contentId = 2L,
+                category = "sample",
+                content = "Sample feed 2",
+                media = "Test Media",
+                createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
+                updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
+            )
+        )
+        every { contentRepository.findAllByCreatedTimeBetween(any(), any()) } returns mockContents
+
+        val exception = assertThrows<IllegalArgumentException> {
+            contentService.filterByCreatedTime(null, null)
+        }
+
+        assertEquals("At least one of startDate or endDate must be provided", exception.message)
+    }
+
 }
