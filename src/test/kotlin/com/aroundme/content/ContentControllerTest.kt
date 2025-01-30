@@ -3,6 +3,7 @@ package com.aroundme.content
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import com.ninjasquad.springmockk.MockkBean
+import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -128,8 +129,9 @@ class ContentControllerTest {
         )
         every { contentService.getContentDetail(contentId) } returns readContentDetailDTO
 
-        mockMvc.perform(get("/contents/$contentId")
-            .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(
+            get("/contents/$contentId")
+                .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -144,8 +146,9 @@ class ContentControllerTest {
         val contentId = 99L
         every { contentService.getContentDetail(contentId) } throws IllegalArgumentException("Content with id $contentId not found")
 
-        mockMvc.perform(get("/contents/$contentId")
-            .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(
+            get("/contents/$contentId")
+                .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isBadRequest)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -182,4 +185,55 @@ class ContentControllerTest {
             .andExpect(jsonPath("$.media").value("Updated Media"))
             .andExpect(jsonPath("$.updatedTime").exists())
     }
+
+    @Test
+    fun `should return content list when valid category is provided`() {
+        val category = "Technology"
+        val mockContents = listOf(
+            ReadContentDTO(1L,
+                "Technology",
+                "Tech News",
+                "media1",
+                LocalDateTime.now(),
+                LocalDateTime.now()),
+            ReadContentDTO(2L,
+                "Technology",
+                "AI Trends",
+                "media2",
+                LocalDateTime.now(),
+                LocalDateTime.now())
+        )
+        every { contentService.filterByCategory(category) } returns mockContents
+
+        mockMvc.perform(
+            get("/contents/filter/category")
+                .param("category", category)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.size()").value(2))
+            .andExpect(jsonPath("$[0].contentId").value(1))
+            .andExpect(jsonPath("$[0].content").value("Tech News"))
+            .andExpect(jsonPath("$[1].contentId").value(2))
+            .andExpect(jsonPath("$[1].content").value("AI Trends"))
+        verify(exactly = 1) { contentService.filterByCategory(category) }
+    }
+
+    @Test
+    fun `should return empty list when category does not exist`() {
+        val category = "NonExistentCategory"
+        every { contentService.filterByCategory(category) } returns emptyList()
+
+        mockMvc.perform(
+            get("/contents/filter/category")
+                .param("category", category)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.size()").value(0))
+        verify(exactly = 1) { contentService.filterByCategory(category) }
+    }
+
 }

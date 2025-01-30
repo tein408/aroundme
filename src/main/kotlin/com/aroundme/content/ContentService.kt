@@ -113,4 +113,21 @@ class ContentService (
         )
     }
 
+    /**
+     * Filters contents by category
+     *
+     * @param category
+     * @return content list
+     */
+    fun filterByCategory(category: String): List<ReadContentDTO> {
+        logger.info("Service - Getting content by category: $category")
+
+        if (category.isEmpty()) {
+            throw IllegalArgumentException("Invalid category string")
+        }
+
+        val filteredContents = contentRepository.findAllByCategoryIs(category)
+        return filteredContents.map { it.toReadContentDTO() }
+    }
+
 }
