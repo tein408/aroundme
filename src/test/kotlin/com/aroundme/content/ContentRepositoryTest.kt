@@ -20,7 +20,7 @@ class ContentRepositoryTest {
     fun `should delete a content successfully`() {
         val content = Content(
             category = "Test Category",
-            content = "Test Content",
+            feed = "Test Content",
             media = "Test Media",
             createdTime = LocalDateTime.now(),
             updatedTime = LocalDateTime.now()

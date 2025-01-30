@@ -121,5 +121,20 @@ class ContentController (
             .ok()
             .body(contentList)
     }
+    
+    /**
+     * Filters contents by category
+     *
+     * @param category
+     * @return content list
+     */
+    @GetMapping("/contents/filter/category")
+    fun filterByCategory(@RequestParam category: String): ResponseEntity<List<ReadContentDTO>> {
+        logger.info("Controller - Getting content by category $category")
+        val filteredContentList = contentService.filterByCategory(category)
+        return ResponseEntity
+            .ok()
+            .body(filteredContentList)
+    }
 
 }

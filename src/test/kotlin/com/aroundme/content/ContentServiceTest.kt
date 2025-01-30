@@ -1,11 +1,13 @@
 package com.aroundme.content
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.data.repository.findByIdOrNull
@@ -152,7 +154,7 @@ class ContentServiceTest {
     }
 
     @Test
-    fun `should throw an exception when updating content if the content's text does not exist`() {
+    fun `should throw an exception when updating content if the content text does not exist`() {
         val contentId = 1L
         val updateContentDTO = UpdateContentDTO(
             category = "Updated Category",
@@ -192,7 +194,7 @@ class ContentServiceTest {
 
         assertEquals("Content with id $contentId not found", exception.message)
     }
-    
+
     @Test
     fun `should delete a content successfully`() {
         val contentId = 1L
@@ -280,7 +282,7 @@ class ContentServiceTest {
             Content(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -288,7 +290,7 @@ class ContentServiceTest {
             Content(
                 contentId = 2L,
                 category = "sample",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -309,7 +311,7 @@ class ContentServiceTest {
             Content(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -317,7 +319,7 @@ class ContentServiceTest {
             Content(
                 contentId = 2L,
                 category = "sample",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -338,7 +340,7 @@ class ContentServiceTest {
             Content(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -346,7 +348,7 @@ class ContentServiceTest {
             Content(
                 contentId = 2L,
                 category = "sample",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -366,7 +368,7 @@ class ContentServiceTest {
             Content(
                 contentId = 1L,
                 category = "sample",
-                content = "Sample feed 1",
+                feed = "Sample feed 1",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 5, 12, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 5, 12, 0)
@@ -374,7 +376,7 @@ class ContentServiceTest {
             Content(
                 contentId = 2L,
                 category = "sample",
-                content = "Sample feed 2",
+                feed = "Sample feed 2",
                 media = "Test Media",
                 createdTime = LocalDateTime.of(2025, 1, 9, 18, 0),
                 updatedTime = LocalDateTime.of(2025, 1, 9, 18, 0)
@@ -387,6 +389,45 @@ class ContentServiceTest {
         }
 
         assertEquals("At least one of startDate or endDate must be provided", exception.message)
+    }
+
+    
+    @Test
+    fun `should return content list when valid category is provided`() {
+        val category = "Technology"
+        val mockContents = listOf(
+            Content(1L, "Technology", "Tech News", "media1", LocalDateTime.now(), LocalDateTime.now()),
+            Content(2L, "Technology", "AI Trends", "media2", LocalDateTime.now(), LocalDateTime.now())
+        )
+        every { contentRepository.findAllByCategoryIs(category) } returns mockContents
+
+        val result = contentService.filterByCategory(category)
+
+        assertThat(result).hasSize(2)
+        assertThat(result[0].feed).isEqualTo("Tech News")
+        assertThat(result[1].feed).isEqualTo("AI Trends")
+        verify(exactly = 1) { contentRepository.findAllByCategoryIs(category) }
+    }
+
+    @Test
+    fun `should return empty list when category does not exist`() {
+        val category = "NonExistentCategory"
+        every { contentRepository.findAllByCategoryIs(category) } returns emptyList()
+
+        val result = contentService.filterByCategory(category)
+
+        assertThat(result).isEmpty()
+        verify(exactly = 1) { contentRepository.findAllByCategoryIs(category) }
+    }
+
+    @Test
+    fun `should throw IllegalArgumentException when category is empty`() {
+        val category = ""
+
+        val exception = assertThrows<IllegalArgumentException> {
+            contentService.filterByCategory(category)
+        }
+        assertEquals("Invalid category string", exception.message)
     }
 
 }
