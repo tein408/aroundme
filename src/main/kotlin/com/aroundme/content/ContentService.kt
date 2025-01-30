@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -40,11 +41,11 @@ class ContentService (
         logger.info("Service - Creating new content: $createContentDTO")
         val currentTime = LocalDateTime.now()
 
-        validateContent(createContentDTO.content)
+        validateContent(createContentDTO.feed)
 
         val content = Content(
             category = createContentDTO.category,
-            content = createContentDTO.content,
+            feed = createContentDTO.feed,
             media = createContentDTO.media,
             createdTime = currentTime,
             updatedTime = currentTime
@@ -55,7 +56,7 @@ class ContentService (
         return ReadContentDetailDTO(
             savedContent.contentId,
             createContentDTO.category,
-            createContentDTO.content,
+            createContentDTO.feed,
             createContentDTO.media,
             createContentDTO.createdTime,
             createContentDTO.updatedTime
@@ -92,27 +93,80 @@ class ContentService (
         logger.info("Service - Updating content by id: $contentId and updated content: $updateContentDTO")
 
         updateContentDTO.validate()
-        validateContent(updateContentDTO.content)
+        validateContent(updateContentDTO.feed)
 
         val currentTime = LocalDateTime.now()
         val findContent = contentRepository.findByIdOrNull(contentId)
             ?: throw IllegalArgumentException("Content with id $contentId not found")
 
         updateContentDTO.category.let { findContent.category = it }
-        updateContentDTO.content.let { findContent.content = it }
+        updateContentDTO.feed.let { findContent.feed = it }
         updateContentDTO.media.let { findContent.media = it }
         findContent.updatedTime = currentTime
 
         return ReadContentDetailDTO(
             contentId,
             updateContentDTO.category,
-            updateContentDTO.content,
+            updateContentDTO.feed,
             updateContentDTO.media,
             findContent.createdTime,
             findContent.updatedTime
         )
     }
 
+    /**
+     * Deletes a content through contentId
+     *
+     * @param contentId
+     * @return void
+     */
+    @Transactional
+    fun deleteContent(contentId: Long) {
+        logger.info("Service - Deleting content by id: $contentId")
+        val content = contentRepository.findByIdOrNull(contentId)
+            ?: throw IllegalArgumentException("Content with id $contentId not found")
+        contentRepository.delete(content)
+        logger.info("Content with id $contentId has been deleted")
+    }
+    
+    /**
+     * Searches content through query
+     *
+     * @param query
+     * @return content list
+     */
+    fun searchContent(query: String): List<ReadContentDTO> {
+        logger.info("Service - Searching content by query: $query")
+        val searchContent = contentRepository.findAllByFeedContains(query)
+        return searchContent.map { it.toReadContentDTO() }
+    }
+    
+    /**
+     * Filters content through startDate and endDate
+     *
+     * @param startDate, endDate
+     * @return content list
+     */
+    fun filterByCreatedTime(startDate: String?, endDate: String?): List<ReadContentDTO> {
+        logger.info("Service - Filtering content by created time: startDate=$startDate, endDate=$endDate")
+        val (startDateTime, endDateTime) = adjustDateRange(startDate, endDate)
+        val filteredContents = contentRepository.findAllByCreatedTimeBetween(startDateTime, endDateTime)
+        return filteredContents.map { it.toReadContentDTO() }
+    }
+
+    private fun adjustDateRange(inputStartDate: String?, inputEndDate: String?): Pair<LocalDateTime, LocalDateTime> {
+        if (inputStartDate == null && inputEndDate == null) {
+            throw IllegalArgumentException("At least one of startDate or endDate must be provided")
+        }
+
+        val startDate = inputStartDate?.let { LocalDate.parse(it) }
+        val endDate = inputEndDate?.let { LocalDate.parse(it) }
+        val finalStartDate = startDate ?: endDate!!
+        val finalEndDate = endDate ?: startDate!!
+
+        return finalStartDate.atStartOfDay() to finalEndDate.atTime(23, 59, 59)
+    }
+    
     /**
      * Filters contents by category
      *
