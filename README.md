@@ -1,92 +1,74 @@
-# Contents API System
+# 0. 개요
+위치 기반 근접 사용자 추천 서비스입니다.  
 
-## 1. Introduction
-This is a location-based service that recommends nearby users.  
-Developing the necessary features step by step, starting with smaller components.  
-The first function is content-related functions.
+사용자는 자신의 컨텐츠를 등록할 수 있고, 다른 사용자는 이 컨텐츠에 대해 '좋아요'를 표시할 수 있습니다.  
+사용자가 접속한 위치를 기반으로, 주변의 특정 사용자를 추천합니다.
 
-## 2. Content API System
+## 1. API 시스템
 
-The Content API provides the following functionalities:
-- **Retrieve Content List**
-- **Retrieve Content Details**
-- **Search for Content**
-- **Filter Content**
-- **Add New Content**
-- **Update Existing Content**
-- **Delete Content**
+### 1.1 Contents API 시스템
 
-## 3. Technical Requirements
+- 컨텐츠 API는 컨텐츠 목록을 제공합니다.
+- 컨텐츠 API는 컨텐츠 상세 정보를 제공합니다.
+- 컨텐츠 API는 컨텐츠 컨텐츠 내용에 대해 검색 기능을 제공합니다.
+- 컨텐츠 API는 카테고리와 생성날짜에 대해 필터링 기능을 제공합니다.
+- 컨텐츠 API는 컨텐츠 입력 기능을 제공합니다.
+- 컨텐츠 API는 컨텐츠 수정 기능을 제공합니다.
+- 컨텐츠 API는 컨텐츠 삭제 기능을 제공합니다.
 
-The system's key technical requirements are as follows:
-- **Programming Language**: Kotlin
-- **Framework**: Spring
-- **Database**: Relational database
-- **Test Code**: Write test cases to ensure system accuracy.
-- **Caching System**: Use a caching system for performance optimization.
-- **Logging System**: Implement a logging system to record system events.
+### 1.2 Likes API 시스템
 
-## 4. Interface
+- 사용자는 콘텐츠에 좋아요를 표시할 수 있습니다.
+- 사용자는 좋아요를 취소할 수 있습니다.
+- 사용자는 자신이 좋아요를 표시한 컨텐츠 목록을 조회할 수 있습니다.
+- 시스템은 각 컨텐츠에 대한 좋아요 수를 집계하고 표시합니다.
 
-### 4.1 Content API
+### 1.3 Locations 시스템
 
-The Content API provides the following endpoints:
+- 사용자의 위치 정보 (위도, 경도)를 저장합니다.
+- 주어진 거리 범위 내에 있는 사용자를 검색합니다.
+- 검색 결과는 거리 순으로 정렬하여 제공합니다.
+- 사용자 정보에는 사용자 ID, 이름, 위치 정보 (위도, 경도)가 포함됩니다.
+- API는 사용자 등록, 위치 정보 업데이트, 근접 사용자 검색 기능을 제공합니다.
 
-| Feature                   | Method | Endpoint                          | Description                                         |
-|---------------------------|--------|-----------------------------------|-----------------------------------------------------|
-| Retrieve Content List      | GET    | `/contents`                      | Retrieves a list of all content.                    |
-| Retrieve Content Details   | GET    | `/contents/{contentId}`          | Retrieves detailed information for specific content. |
-| Search for Content         | GET    | `/contents?q={query}`            | Searches for content based on the given query.      |
-| Filter Content             | GET    | `/contents?category={category}`  | Filters content based on the given category.        |
-| Add New Content            | POST   | `/contents`                      | Adds new content to the system.                     |
-| Update Existing Content    | PATCH  | `/contents/{contentId}`          | Updates the details of specific content.            |
-| Delete Content             | DELETE | `/contents/{contentId}`          | Deletes specific content from the system.           |
+## 2. 기술 요구 사항
 
-## 5. Constraints
+- 프로그래밍 언어는 Kotlin을 사용합니다.
+- 프레임워크는 Spring을 사용합니다.
+- 데이터베이스는 관계형 데이터베이스, NoSQL 데이터베이스 등 자유롭게 선택합니다.
+- 테스트 코드를 작성하여 시스템의 정확성을 검증합니다.
+- 캐싱 시스템을 사용하여 성능을 최적화합니다.
+- 로깅 시스템을 사용하여 시스템 이벤트를 기록합니다.
 
-The system operates under the following constraints:
-- Each content item must have a unique ID.
-- A user can only like a piece of content once.
+## 3. 테스트 실행 방법
 
-## 6. Application Architecture
-
-The application is designed with the following structure:
-- **Controller Layer**: Handles HTTP requests and responses.
-- **Service Layer**: Contains business logic and interacts with the repository layer.
-- **Repository Layer**: Communicates with the database for data persistence.
-- **Domain Model**: Represents the core entities and their relationships.
-- **Utility Layer**: Provides reusable helpers such as caching, logging, and validation utilities.
-
-## 7. How to Run Tests
-
-To execute the test cases:
-1. Navigate to the project root directory.
-2. Run the following command in the terminal:
+1. 프로젝트 루트 디렉토리로 이동합니다.
+2. 터미널에서 다음 명령을 실행합니다:
    ```bash
    ./gradlew test
    ```
-3. Test results will be displayed in the terminal.
+3. 터미널에 테스트 결과가 출력됩니다.
 
-## 8. Checking Test Coverage
+## 4. Test coverage 확인
+커버리지 측정을 위해 `JaCoCo` 라이브러리를 사용하였습니다. 
 
-To check the test coverage:
-
-1. Generate the test coverage report by running:
+1. 프로젝트 루트 디렉토리로 이동합니다.
+2. 터미널에서 다음 명령어를 실행합니다.
    ```bash
    ./gradlew jacocoTestReport
    ```
-2. The coverage report can be found in the `build/reports/jacoco/test/html` directory.
+3. 테스트 커버리지 결과는 `build/reports/jacoco/test/html/index.html`에서 확인할 수 있습니다.
 
-## 9. Running the Server Application
+## 5. 어플리케이션 실행
 
 To run the server application:
 
-1. Build the project using Gradle:
+1. 터미널에서 아래의 명령어를 실행하여 프로젝트를 빌드합니다.
    ```bash
    ./gradlew build
    ```
-2. Start the application:
+2. 빌드가 완료되면, 프로젝트를 실행합니다.
    ```bash
    java -jar build/libs/aroundme.jar
    ```
-3. The server will start, and you can access the API at `http://localhost:8080`.
+3. 서버가 실행되면 `http://localhost:8080`에서 확인할 수 있습니다.
