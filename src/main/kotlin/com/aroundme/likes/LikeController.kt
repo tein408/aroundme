@@ -17,15 +17,15 @@ class LikeController (
     private val logger = KotlinLogging.logger {}
 
     /**
-     * Creates a like on a content by user
+     * Increases a like on a content by user
      *
      * @param contentId, userId
      * @return ResponseEntity<Void>
      */
-    @PostMapping("/contents/{contentId}/likes")
+    @PostMapping("/contents/{contentId}/like")
     fun likeContent(@PathVariable contentId: Long, @RequestBody userId: Long): ResponseEntity<Void> {
         logger.info("Liking content $contentId $userId")
-        likeService.addLike(contentId, userId)
+        likeService.increaseLikeCount(contentId, userId)
         return ResponseEntity.noContent().build()
     }
 }

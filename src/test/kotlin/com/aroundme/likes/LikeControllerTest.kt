@@ -27,10 +27,10 @@ class LikeControllerTest {
         val contentId = 1L
         val userId = 100L
 
-        justRun {  likeService.addLike(contentId, userId) }
+        justRun {  likeService.increaseLikeCount(contentId, userId) }
 
         mockMvc.perform(
-            post("/contents/$contentId/likes")
+            post("/contents/$contentId/like")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(userId))
         )

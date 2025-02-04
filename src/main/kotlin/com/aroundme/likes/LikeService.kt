@@ -13,24 +13,24 @@ class LikeService (
     private val logger = KotlinLogging.logger {}
 
     /**
-     * Creates a like on a content by user
+     * Increases a like on a content by user
      *
      * @param contentId, userId
      * @return void
      */
     @Transactional
-    fun addLike(contentId: Long, userId: Long) {
+    fun increaseLikeCount(contentId: Long, userId: Long) {
         logger.info("Service - Adding like to $contentId by $userId")
         val currentTime = LocalDateTime.now()
-        val findLikes = likeRepository.findByContentIdAndUserId(contentId, userId)
+        val likeId = LikesId(contentId, userId)
+        val findLikes = likeRepository.findLikesByLikeId(LikesId(contentId, userId))
 
         if (findLikes != null) {
             throw IllegalStateException("User $userId already liked this content $contentId")
         }
 
         val likes = Likes(
-            contentId = contentId,
-            userId = userId,
+            likeId = likeId,
             createdTime = currentTime
         )
         val savedLikes = likeRepository.save(likes)

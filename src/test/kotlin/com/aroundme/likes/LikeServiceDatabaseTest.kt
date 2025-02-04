@@ -1,6 +1,7 @@
 package com.aroundme.likes
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -27,28 +28,28 @@ class LikeServiceDatabaseTest {
         val contentId = 1L
         val userId = 100L
 
-        likeService.addLike(contentId, userId)
+        likeService.increaseLikeCount(contentId, userId)
 
-        val savedLike = likeRepository.findByContentIdAndUserId(contentId, userId)
+        val savedLike = likeRepository.findById(LikesId(contentId, userId)).orElse(null)
         assertNotNull(savedLike)
-        assertEquals(contentId, savedLike?.contentId)
-        assertEquals(userId, savedLike?.userId)
+        assertEquals(contentId, savedLike?.likeId?.contentId)
+        assertEquals(userId, savedLike?.likeId?.userId)
     }
 
     @Test
-    fun `should prevent duplicate likes`() {
+    fun `should raise an exception when a pair of contentId and userId is already counted for likes`() {
         val contentId = 1L
         val userId = 100L
-        likeService.addLike(contentId, userId)
+        likeService.increaseLikeCount(contentId, userId)
 
         val exception = assertThrows<IllegalStateException> {
-            likeService.addLike(contentId, userId)
+            likeService.increaseLikeCount(contentId, userId)
         }
 
         assertEquals("User $userId already liked this content $contentId", exception.message)
-        val findLikes = likeRepository.findByContentIdAndUserId(contentId, userId)
-        assertEquals(contentId, findLikes?.contentId)
-        assertEquals(userId, findLikes?.userId)
+        val findLikes = likeRepository.findById(LikesId(contentId, userId)).orElse(null)
+        assertEquals(contentId, findLikes?.likeId?.contentId)
+        assertEquals(userId, findLikes?.likeId?.userId)
     }
 
 }
