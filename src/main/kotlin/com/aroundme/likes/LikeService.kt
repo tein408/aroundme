@@ -19,7 +19,7 @@ class LikeService (
      * @return void
      */
     @Transactional
-    fun increaseLikeCount(contentId: Long, userId: Long) {
+    fun likeContent(contentId: Long, userId: Long) {
         logger.info("Service - Increasing a like to $contentId by $userId")
         val currentTime = LocalDateTime.now()
         val likeId = LikesId(contentId, userId)
@@ -44,7 +44,7 @@ class LikeService (
      * @return void
      */
     @Transactional
-    fun decreaseLikeCount(contentId: Long, userId: Long) {
+    fun unlikeContent(contentId: Long, userId: Long) {
         logger.info("Service - Decreasing a like to $contentId by $userId")
         val findLikes = likeRepository.findLikesByLikeId(LikesId(contentId, userId))
             ?: throw IllegalStateException("User $userId is not liked this content $contentId")

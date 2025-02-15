@@ -26,7 +26,7 @@ class LikeController (
     @PostMapping("/contents/{contentId}/like")
     fun increaseLikeCount(@PathVariable contentId: Long, @RequestBody userId: Long): ResponseEntity<Void> {
         logger.info("Liking content $contentId $userId")
-        likeService.increaseLikeCount(contentId, userId)
+        likeService.likeContent(contentId, userId)
         return ResponseEntity.noContent().build()
     }
 
@@ -39,7 +39,7 @@ class LikeController (
     @DeleteMapping("/contents/{contentId}/like")
     fun decreaseLikeCount(@PathVariable contentId: Long, @RequestBody userId: Long): ResponseEntity<Void> {
         logger.info("Decrease a like on content $contentId by $userId")
-        likeService.decreaseLikeCount(contentId, userId)
+        likeService.unlikeContent(contentId, userId)
         return ResponseEntity.noContent().build()
     }
 

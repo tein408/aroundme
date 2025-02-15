@@ -16,7 +16,7 @@ class LikeServiceTest {
     private val likeService = LikeService(likeRepository)
 
     @Test
-    fun `should successfully call increaseLikeCount function when user has not liked before`() {
+    fun `should successfully call likeContent function when user has not liked before`() {
         val contentId = 1L
         val userId = 100L
         val likeId = LikesId(contentId, userId)
@@ -27,7 +27,7 @@ class LikeServiceTest {
         every { likeRepository.findLikesByLikeId(likeId) } returns null
         every { likeRepository.save(any()) } returns mockLikes
 
-        likeService.increaseLikeCount(contentId, userId)
+        likeService.likeContent(contentId, userId)
 
         verify { likeRepository.findLikesByLikeId(likeId) }
         verify { likeRepository.save(any()) }
@@ -45,7 +45,7 @@ class LikeServiceTest {
         every { likeRepository.findLikesByLikeId(likeId) } returns mockLikes
 
         val exception = assertThrows<IllegalStateException> {
-            likeService.increaseLikeCount(contentId, userId)
+            likeService.likeContent(contentId, userId)
         }
 
         assertEquals("User $userId already liked this content $contentId", exception.message)
@@ -62,7 +62,7 @@ class LikeServiceTest {
         every { likeRepository.findLikesByLikeId(likeId) } returns likes
         every { likeRepository.delete(likes) } just Runs
 
-        likeService.decreaseLikeCount(contentId, userId)
+        likeService.unlikeContent(contentId, userId)
 
         verify { likeRepository.findLikesByLikeId(likeId) }
         verify { likeRepository.delete(likes) }
@@ -76,7 +76,7 @@ class LikeServiceTest {
         every { likeRepository.findLikesByLikeId(likeId) } returns null
 
         val exception = assertThrows<IllegalStateException> {
-            likeService.decreaseLikeCount(contentId, userId)
+            likeService.unlikeContent(contentId, userId)
         }
 
         assertEquals("User $userId is not liked this content $contentId", exception.message)

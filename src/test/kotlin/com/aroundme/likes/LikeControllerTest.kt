@@ -28,7 +28,7 @@ class LikeControllerTest {
         val contentId = 1L
         val userId = 100L
 
-        justRun {  likeService.increaseLikeCount(contentId, userId) }
+        justRun {  likeService.likeContent(contentId, userId) }
 
         mockMvc.perform(
             post("/contents/$contentId/like")
@@ -42,7 +42,7 @@ class LikeControllerTest {
     fun `should successfully decrease a like count by user`() {
         val contentId = 1L
         val userId = 100L
-        justRun {  likeService.decreaseLikeCount(contentId, userId) }
+        justRun {  likeService.unlikeContent(contentId, userId) }
 
         mockMvc.perform(
             delete("/contents/$contentId/like")

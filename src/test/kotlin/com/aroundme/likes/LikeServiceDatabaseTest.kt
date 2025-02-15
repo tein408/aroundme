@@ -30,7 +30,7 @@ class LikeServiceDatabaseTest {
         val contentId = 1L
         val userId = 100L
 
-        likeService.increaseLikeCount(contentId, userId)
+        likeService.likeContent(contentId, userId)
 
         val savedLike = likeRepository.findById(LikesId(contentId, userId)).orElse(null)
         assertNotNull(savedLike)
@@ -42,10 +42,10 @@ class LikeServiceDatabaseTest {
     fun `should raise an exception when a pair of contentId and userId is already counted for likes`() {
         val contentId = 1L
         val userId = 100L
-        likeService.increaseLikeCount(contentId, userId)
+        likeService.likeContent(contentId, userId)
 
         val exception = assertThrows<IllegalStateException> {
-            likeService.increaseLikeCount(contentId, userId)
+            likeService.likeContent(contentId, userId)
         }
 
         assertEquals("User $userId already liked this content $contentId", exception.message)
@@ -62,7 +62,7 @@ class LikeServiceDatabaseTest {
         val likes = Likes(likeId, LocalDateTime.now())
         likeRepository.save(likes)
 
-        likeService.decreaseLikeCount(contentId, userId)
+        likeService.unlikeContent(contentId, userId)
 
         assertTrue(likeRepository.findById(likeId).isEmpty)
     }
@@ -73,7 +73,7 @@ class LikeServiceDatabaseTest {
         val userId = 100L
 
         val exception = assertThrows<IllegalStateException> {
-            likeService.decreaseLikeCount(contentId, userId)
+            likeService.unlikeContent(contentId, userId)
         }
 
         assertEquals("User $userId is not liked this content $contentId", exception.message)
