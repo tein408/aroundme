@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -27,12 +28,26 @@ class LikeControllerTest {
         val contentId = 1L
         val userId = 100L
 
-        justRun {  likeService.increaseLikeCount(contentId, userId) }
+        justRun {  likeService.likeContent(contentId, userId) }
 
         mockMvc.perform(
             post("/contents/$contentId/like")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(userId))
+        )
+            .andExpect(status().isNoContent)
+    }
+
+    @Test
+    fun `should successfully decrease a like count by user`() {
+        val contentId = 1L
+        val userId = 100L
+        justRun {  likeService.unlikeContent(contentId, userId) }
+
+        mockMvc.perform(
+            delete("/contents/$contentId/like")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userId))
         )
             .andExpect(status().isNoContent)
     }
